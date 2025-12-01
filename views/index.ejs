@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1><%= title %></h1>
+    <p>서버가 정상적으로 연결되었습니다!</p>
+    <p>MySQL 연결 확인 메시지를 터미널에서 확인하세요.</p>
+    <div id="status">
+        <h2>개발 상태</h2>
+        <ul>
+            <li>Express 서버: 구동 완료</li>
+            <li>DB 연결 및 모델: <%= title %></li>
+            <li>다음 단계: 사용자 인증 (Passport) 구현</li>
+        </ul>
+    </div>
+</body>
+</html>
