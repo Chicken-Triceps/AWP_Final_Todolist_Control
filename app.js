@@ -5,6 +5,13 @@ const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
 
+const session = require('express-session'); // 세션 관리를 위한 모듈
+const passport = require('passport'); // Passport 모듈
+
+// Passport 설정 모듈 불러오기
+const passportConfig = require('./passport'); 
+passportConfig(passport); // Passport 설정 함수 실행
+
 // 2. 환경 변수(.env) 로드
 // 이 코드가 가장 먼저 실행되어 .env 파일의 변수들을 process.env 객체에 저장
 dotenv.config();
@@ -30,6 +37,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 8. 요청 본문(Body) 파싱 설정
 app.use(express.json()); // JSON 형식 데이터 처리
 app.use(express.urlencoded({ extended: false })); // 폼 데이터 처리
+
+// 9. 세션 설정
+app.use(session({
+    resave: false, // 변경사항이 없어도 세션 저장소에 다시 저장할지 여부
+    saveUninitialized: false, // 세션에 저장할 내용이 없어도 세션을 만들지 여부
+    secret: process.env.COOKIE_SECRET || 'todo_secret_key', // .env에 쿠키 암호화 키 추가 필요
+    cookie: {
+        httpOnly: true, // 자바스크립트로 접근 금지
+        secure: false, // https가 아닌 환경에서도 사용 가능
+    },
+    name: 'session-cookie',
+}));
+
+// 10. Passport 미들웨어 등록 (세션 미들웨어 뒤에 위치해야 함)
+app.use(passport.initialize()); // req.user, req.login, req.logout 등을 생성
+app.use(passport.session()); // 세션에 Passport 정보를 저장 및 복원
 
 // 데이터베이스 연결 확인 및 동기화 ====================================================================
 
