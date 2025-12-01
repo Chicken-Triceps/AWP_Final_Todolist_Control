@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const { isNotLoggedIn } = require('./middlewares');
 const { Schedule } = require('../models');
+const { Category } = require('../models');
 
 // 공휴일 목록 (2025~2026년, 대체공휴일 포함)
 const holidays = {
@@ -54,11 +55,12 @@ router.get('/', async (req, res, next) => {
     const nextDate = new Date(currentYear, currentMonth - 1 + 1, 1);
 
     let schedules = [];
+    let categories = [];
+    
     if (req.user) {
         try {
-            schedules = await Schedule.findAll({
-                where: { userId: req.user.id },
-            });
+            schedules = await Schedule.findAll({ where: { userId: req.user.id } });
+            categories = await Category.findAll({ where: { userId: req.user.id } });
         } catch (error) {
             console.error(error);
             next(error);
@@ -77,6 +79,7 @@ router.get('/', async (req, res, next) => {
         nextYear: nextDate.getFullYear(),
         nextMonth: nextDate.getMonth() + 1,
         schedules,
+        categories,
         
         realYear,
         realMonth,

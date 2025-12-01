@@ -1,15 +1,79 @@
+/* public/style.css */
+
 /* 기본 레이아웃 */
-body { font-family: 'Arial', sans-serif; padding: 20px; }
+body { font-family: 'Arial', sans-serif; padding: 20px; background-color: #f4f6f8; }
 a { text-decoration: none; color: inherit; }
 
-/* 캘린더 전체 틀 */
-.calendar-container {
-    max-width: 800px;
+/* [수정] 3단 레이아웃 컨테이너 */
+.main-wrapper {
+    display: flex;          /* 가로 배치 */
+    max-width: 1400px;      /* 전체 너비 늘림 */
     margin: 0 auto;
-    text-align: center;
+    gap: 20px;              /* 패널 사이 간격 */
+    align-items: flex-start;
 }
 
-/* 캘린더 헤더 (년/월 이동) */
+/* [신규] 1. 좌측 카테고리 패널 */
+.category-sidebar {
+    flex: 1; /* 너비 비중 1 */
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    min-height: 200px;
+}
+
+/* [수정] 카테고리 아이템 스타일 */
+.category-item {
+    padding: 10px 0; /* 좌우 패딩 제거 */
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 요소 사이 간격 */
+}
+
+/* [수정] 카테고리 라벨 (글자 자체에 색 입히기) */
+.category-label {
+    flex: 1; /* 남은 공간 차지 */
+    padding: 5px 10px;
+    border-radius: 15px; /* 둥근 뱃지 모양 */
+    color: white; /* 글자색 흰색 (배경색이 어두울 것 가정) */
+    font-weight: bold;
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3); /* 글자 잘 보이게 그림자 */
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.category-label:hover {
+    opacity: 0.8; /* 마우스 올리면 살짝 투명하게 */
+}
+
+/* [추가] 카테고리 체크박스 */
+.category-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* 삭제 버튼 */
+.delete-btn {
+    cursor: pointer;
+    color: #ccc;
+    font-weight: bold;
+    padding: 0 5px;
+}
+.delete-btn:hover { color: red; }
+
+/* [수정] 2. 중앙 캘린더 영역 ==============================================================*/ 
+.calendar-wrapper {
+    flex: 3; /* 너비 비중 3 (가장 넓게) */
+    background-color: white; /* 배경 흰색 추가 */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
 .calendar-header {
     display: flex;
     justify-content: space-between;
@@ -25,64 +89,88 @@ a { text-decoration: none; color: inherit; }
     cursor: pointer;
 }
 
-/* 캘린더 그리드 (요일 및 날짜) */
 .calendar-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* 7열 (일~토) */
+    grid-template-columns: repeat(7, 1fr);
     gap: 1px;
-    background-color: #ddd; /* 격자 선 색상 */
-    border: 1px solid #ddd;
+    background-color: #eee;
+    border: 1px solid #eee;
 }
 
-/* 요일 헤더 (일, 월, 화...) */
+/* 요일 헤더 색상 */
 .day-name {
-    background-color: #f9f9f9;
+    background-color: #fafafa;
     padding: 10px;
     font-weight: bold;
+    text-align: center;
 }
-/* 일요일 빨간색, 토요일 파란색 */
-.day-name:nth-child(7n+1), .day:nth-child(7n+1) { color: red; }
-.day-name:nth-child(7n), .day:nth-child(7n) { color: blue; }
+.day-name:nth-child(7n+1) { color: red; } /* 일요일 */
+.day-name:nth-child(7n) { color: blue; }  /* 토요일 */
 
-/* 날짜 칸 */
+/* 일요일 날짜 빨간색 */
+.day:nth-child(7n+1) .date-num { color: red; }
+/* [추가] 토요일 날짜 파란색 */
+.day:nth-child(7n) .date-num { color: blue; }
+
 .day {
     background-color: white;
-    padding: 10px;
-    height: 100px; /* 칸 높이 */
+    padding: 5px; /* 패딩을 조금 줄임 */
+    height: 100px;
     text-align: left;
     vertical-align: top;
     position: relative;
-    box-sizing: border-box;
+    box-sizing: border-box; /* 테두리 포함 크기 계산 */
+    cursor: pointer;
 }
-.day:hover { background-color: #f0f8ff; } /* 마우스 올렸을 때 효과 */
+.day:hover { background-color: #f0f8ff; }
 
-/* 빈 날짜 칸 */
-.day.empty {
-    background-color: #fafafa;
-}
+.day.empty { background-color: #fdfdfd; cursor: default; }
 
-/* 오늘 날짜 표시 (회색 테두리 + 약간 둥글게) */
+/* 오늘 날짜 */
 .day.today {
-    border: 3px solid #888;
-    border-radius: 10px;
-    font-weight: bold;
-    background-color: #fffaf0;
+    border: 2px solid #666;
     z-index: 10;
-    padding: 7px;
+}
+/* 선택된 날짜 */
+.day.active-day {
+    background-color: #e3f2fd;
+    border: 2px solid #2196F3;
 }
 
-/* 공휴일 표시 (빨간색 글자) */
-.day.holiday {
-    color: red !important;
-}
-
-/* 공휴일 이름 */
+/* 공휴일 텍스트 */
+.day.holiday { color: red !important; }
 .holiday-name {
-    display: block;
-    font-size: 11px;
-    color: red;
-    margin-top: 4px;
-    white-space: normal; /* 글자가 길면 다음 줄로 넘어감 */
-    word-break: keep-all; /* 한글 단어 중간에서 끊기지 않게 함 */
-    line-height: 1.2; /* 줄 간격 조절 */
+    display: block; font-size: 11px; color: red; margin-top: 5px;
+    white-space: normal; word-break: keep-all; line-height: 1.2;
 }
+.date-num { font-weight: bold; font-size: 14px; }
+
+
+/* 3. 우측 상세 정보 패널 */
+.info-panel {
+    flex: 1; /* 너비 비중 1 */
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    min-height: 400px;
+}
+
+.selected-date-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}
+.lunar-date { color: #888; font-size: 13px; margin-bottom: 20px; }
+.schedule-list { margin-bottom: 20px; color: #666; font-size: 14px; min-height: 100px; }
+
+.add-btn {
+    display: block; width: 100%; padding: 12px;
+    background-color: #4CAF50; color: white;
+    text-align: center; border: none; border-radius: 5px;
+    font-size: 16px; cursor: pointer; transition: background 0.3s;
+}
+.add-btn:hover { background-color: #45a049; }

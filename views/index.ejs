@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <div id="user-status" style="margin-bottom: 20px;">
+    <div id="user-status" style="margin-bottom: 20px; padding: 0 20px;">
         <% if (user) { %>
             <h2>🎉 환영합니다, <%= user.nickname %>님!</h2>
             <a href="/auth/logout">로그아웃</a>
@@ -18,56 +18,106 @@
     <hr>
 
     <% if (user) { %>
-        <div class="calendar-container">
-            <div class="calendar-header">
-                <a href="/?year=<%= prevYear %>&month=<%= prevMonth %>" class="nav-btn">&lt; 이전 달</a>
-                <span><%= year %>년 <%= month %>월</span>
-                <a href="/?year=<%= nextYear %>&month=<%= nextMonth %>" class="nav-btn">다음 달 &gt;</a>
+        <div class="main-wrapper">
+            
+            <div class="category-sidebar">
+                <h3>카테고리</h3>
+                
+                <div id="category-list">
+                    <% if (categories && categories.length > 0) { %>
+                        <% categories.forEach((cat) => { %>
+                            <div class="category-item">
+                                <input type="checkbox" class="category-checkbox" value="<%= cat.id %>">
+                                
+                                <span class="category-label" 
+                                      style="background-color: <%= cat.color %>;"
+                                      onclick="editCategory('<%= cat.id %>', '<%= cat.name %>')">
+                                    <%= cat.name %>
+                                </span>
+
+                                <span class="delete-btn" onclick="deleteCategory('<%= cat.id %>')">×</span>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p style="color:#aaa; font-size:12px;">카테고리를 추가해보세요.</p>
+                    <% } %>
+                </div>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+                <form action="/category" method="post" style="display: flex; gap: 5px;">
+                    <input type="color" name="color" value="#2196F3" style="width: 30px; border: none; background: none; cursor: pointer;">
+                    <input type="text" name="name" placeholder="새 카테고리" required style="width: 100px; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                    <button type="submit" style="border: none; background: #ddd; cursor: pointer; border-radius: 4px;">+</button>
+                </form>
             </div>
 
-            <div class="calendar-grid">
-                <div class="day-name">일</div>
-                <div class="day-name">월</div>
-                <div class="day-name">화</div>
-                <div class="day-name">수</div>
-                <div class="day-name">목</div>
-                <div class="day-name">금</div>
-                <div class="day-name">토</div>
+            <div class="calendar-wrapper">
+                <div class="calendar-header">
+                    <a href="/?year=<%= prevYear %>&month=<%= prevMonth %>" class="nav-btn">&lt; 이전 달</a>
+                    <span><%= year %>년 <%= month %>월</span>
+                    <a href="/?year=<%= nextYear %>&month=<%= nextMonth %>" class="nav-btn">다음 달 &gt;</a>
+                </div>
 
-                <% for(let i = 0; i < startDayOfWeek; i++) { %>
-                    <div class="day empty"></div>
-                <% } %>
+                <div class="calendar-grid">
+                    <div class="day-name">일</div>
+                    <div class="day-name">월</div>
+                    <div class="day-name">화</div>
+                    <div class="day-name">수</div>
+                    <div class="day-name">목</div>
+                    <div class="day-name">금</div>
+                    <div class="day-name">토</div>
 
-                <% for(let day = 1; day <= totalDays; day++) { %>
-                    <% 
-                        // 오늘 날짜인지 확인
-                        let isToday = (year == realYear && month == realMonth && day == realDate);
-                        
-                        // 공휴일인지 확인 (키 형식: 'YYYY-M-D')
-                        let holidayKey = year + '-' + month + '-' + day;
-                        let holidayName = holidays[holidayKey]; 
-                        let isHoliday = holidayName ? true : false;
+                    <% for(let i = 0; i < startDayOfWeek; i++) { %>
+                        <div class="day empty"></div>
+                    <% } %>
 
-                        // 일요일 확인
-                        let currentDayOfWeek = (startDayOfWeek + day - 1) % 7;
-                        let isSunday = (currentDayOfWeek === 0);
-                    %>
+                    <% for(let day = 1; day <= totalDays; day++) { %>
+                        <% 
+                            let isToday = (year == realYear && month == realMonth && day == realDate);
+                            let holidayKey = year + '-' + month + '-' + day;
+                            let holidayName = holidays[holidayKey]; 
+                            let isHoliday = holidayName ? true : false;
+                            let currentDayOfWeek = (startDayOfWeek + day - 1) % 7;
+                            let isSunday = (currentDayOfWeek === 0);
+                        %>
+                        <div class="day <%= isToday ? 'today' : '' %> <%= (isHoliday || isSunday) ? 'holiday' : '' %>"
+                             data-year="<%= year %>" 
+                             data-month="<%= month %>" 
+                             data-day="<%= day %>"
+                             onclick="selectDate(this)">
+                            
+                            <span class="date-num"><%= day %></span>
+                            <% if (isHoliday) { %>
+                                <span class="holiday-name"><%= holidayName %></span>
+                            <% } %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
 
-                    <div class="day <%= isToday ? 'today' : '' %> <%= (isHoliday || isSunday) ? 'holiday' : '' %>">
-                        <span class="date-num"><%= day %></span>
-                        
-                        <% if (isHoliday) { %>
-                            <span class="holiday-name"><%= holidayName %></span>
-                        <% } %>
+            <div class="info-panel">
+                <div class="selected-date-title" id="panel-date">
+                    날짜를 선택하세요
+                </div>
+                <div class="lunar-date" id="panel-lunar">
                     </div>
-                <% } %>
+                
+                <h3>일정 목록</h3>
+                <div class="schedule-list" id="panel-list">
+                    날짜를 클릭하면 일정이 표시됩니다.
+                </div>
+
+                <button type="button" class="add-btn" onclick="openAddModal()">일정 추가 +</button>
             </div>
+
         </div>
     <% } else { %>
         <div style="text-align: center; margin-top: 50px;">
-            <h3>캘린더를 보려면 로그인해주세요.</h3>
+            <h3>로그인하시면 캘린더를 볼 수 있습니다. 📅</h3>
         </div>
     <% } %>
 
+    <script src="/main.js"></script>
 </body>
 </html>

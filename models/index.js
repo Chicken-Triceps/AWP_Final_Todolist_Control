@@ -23,12 +23,12 @@ db.Sequelize = Sequelize;
 
 // 모델 불러오기 ===================================================================
 
-// 아직 파일이 없으므로, 파일 생성 후 이 부분에 코드를 추가해야 함
 db.User = require('./user')(sequelize, Sequelize);
 db.Schedule = require('./schedule')(sequelize, Sequelize);
 db.Task = require('./task')(sequelize, Sequelize);
+db.Category = require('./category')(sequelize, Sequelize);
 
-// 모델 관계 설정 (추후 추가) =======================================================
+// 모델 관계 설정 =======================================================
 
 // User와 Schedule, Schedule와 Task 간의 관계 설정
 Object.keys(db).forEach(modelName => {
