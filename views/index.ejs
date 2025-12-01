@@ -6,29 +6,50 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <h1><%= title %></h1>
-    <p>서버가 정상적으로 연결되었습니다!</p>
-    <p>MySQL 연결 확인 메시지를 터미널에서 확인하세요.</p>
-    
-    <div id="user-status">
+    <div id="user-status" style="margin-bottom: 20px;">
         <% if (user) { %>
-            <h2>🎉 환영합니다, <%= user.nickname %>님!</h2>
-            <p>로그인 이메일: <%= user.email %></p>
+            <h2>환영합니다, <%= user.nickname %>님!</h2>
             <a href="/auth/logout">로그아웃</a>
         <% } else { %>
-            <h2>로그인/회원가입이 필요합니다.</h2>
-            <a href="/login">로그인</a> | 
-            <a href="/join">회원가입</a>
+            <h2>로그인이 필요합니다.</h2>
+            <a href="/login">로그인</a> | <a href="/join">회원가입</a>
         <% } %>
     </div>
     <hr>
-    <div id="status">
-        <h2>개발 상태</h2>
-        <ul>
-            <li>Express 서버: 구동 완료</li>
-            <li>DB 연결 및 모델: <%= title %></li>
-            <li>다음 단계: 사용자 인증 (Passport) 구현</li>
-        </ul>
-    </div>
+
+    <% if (user) { %>
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <a href="/?year=<%= prevYear %>&month=<%= prevMonth %>" class="nav-btn">&lt; 이전 달</a>
+                <span><%= year %>년 <%= month %>월</span>
+                <a href="/?year=<%= nextYear %>&month=<%= nextMonth %>" class="nav-btn">다음 달 &gt;</a>
+            </div>
+
+            <div class="calendar-grid">
+                <div class="day-name">일</div>
+                <div class="day-name">월</div>
+                <div class="day-name">화</div>
+                <div class="day-name">수</div>
+                <div class="day-name">목</div>
+                <div class="day-name">금</div>
+                <div class="day-name">토</div>
+
+                <% for(let i = 0; i < startDayOfWeek; i++) { %>
+                    <div class="day empty"></div>
+                <% } %>
+
+                <% for(let day = 1; day <= totalDays; day++) { %>
+                    <div class="day">
+                        <span class="date-num"><%= day %></span>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    <% } else { %>
+        <div style="text-align: center; margin-top: 50px;">
+            <h3>로그인하시면 캘린더를 볼 수 있습니다. 📅</h3>
+        </div>
+    <% } %>
+
 </body>
 </html>
