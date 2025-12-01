@@ -8,10 +8,10 @@
 <body>
     <div id="user-status" style="margin-bottom: 20px;">
         <% if (user) { %>
-            <h2>환영합니다, <%= user.nickname %>님!</h2>
+            <h2>🎉 환영합니다, <%= user.nickname %>님!</h2>
             <a href="/auth/logout">로그아웃</a>
         <% } else { %>
-            <h2>로그인이 필요합니다.</h2>
+            <h2>로그인/회원가입이 필요합니다.</h2>
             <a href="/login">로그인</a> | <a href="/join">회원가입</a>
         <% } %>
     </div>
@@ -39,15 +39,33 @@
                 <% } %>
 
                 <% for(let day = 1; day <= totalDays; day++) { %>
-                    <div class="day">
+                    <% 
+                        // 오늘 날짜인지 확인
+                        let isToday = (year == realYear && month == realMonth && day == realDate);
+                        
+                        // 공휴일인지 확인 (키 형식: 'YYYY-M-D')
+                        let holidayKey = year + '-' + month + '-' + day;
+                        let holidayName = holidays[holidayKey]; 
+                        let isHoliday = holidayName ? true : false;
+
+                        // 일요일 확인
+                        let currentDayOfWeek = (startDayOfWeek + day - 1) % 7;
+                        let isSunday = (currentDayOfWeek === 0);
+                    %>
+
+                    <div class="day <%= isToday ? 'today' : '' %> <%= (isHoliday || isSunday) ? 'holiday' : '' %>">
                         <span class="date-num"><%= day %></span>
+                        
+                        <% if (isHoliday) { %>
+                            <span class="holiday-name"><%= holidayName %></span>
+                        <% } %>
                     </div>
                 <% } %>
             </div>
         </div>
     <% } else { %>
         <div style="text-align: center; margin-top: 50px;">
-            <h3>로그인하시면 캘린더를 볼 수 있습니다. 📅</h3>
+            <h3>캘린더를 보려면 로그인해주세요.</h3>
         </div>
     <% } %>
 

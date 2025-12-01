@@ -1,5 +1,3 @@
-/* public/style.css */
-
 /* 기본 레이아웃 */
 body { font-family: 'Arial', sans-serif; padding: 20px; }
 a { text-decoration: none; color: inherit; }
@@ -54,10 +52,37 @@ a { text-decoration: none; color: inherit; }
     text-align: left;
     vertical-align: top;
     position: relative;
+    box-sizing: border-box;
 }
 .day:hover { background-color: #f0f8ff; } /* 마우스 올렸을 때 효과 */
 
-/* 빈 날짜 칸 (회색 처리 등) */
+/* 빈 날짜 칸 */
 .day.empty {
     background-color: #fafafa;
+}
+
+/* 오늘 날짜 표시 (회색 테두리 + 약간 둥글게) */
+.day.today {
+    border: 3px solid #888;
+    border-radius: 10px;
+    font-weight: bold;
+    background-color: #fffaf0;
+    z-index: 10;
+    padding: 7px;
+}
+
+/* 공휴일 표시 (빨간색 글자) */
+.day.holiday {
+    color: red !important;
+}
+
+/* 공휴일 이름 */
+.holiday-name {
+    display: block;
+    font-size: 11px;
+    color: red;
+    margin-top: 4px;
+    white-space: normal; /* 글자가 길면 다음 줄로 넘어감 */
+    word-break: keep-all; /* 한글 단어 중간에서 끊기지 않게 함 */
+    line-height: 1.2; /* 줄 간격 조절 */
 }
