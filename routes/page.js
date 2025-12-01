@@ -54,12 +54,21 @@ router.get('/', async (req, res, next) => {
     const prevDate = new Date(currentYear, currentMonth - 1 - 1, 1);
     const nextDate = new Date(currentYear, currentMonth - 1 + 1, 1);
 
+    // 일정 및 카테고리 조회
     let schedules = [];
     let categories = [];
     
     if (req.user) {
         try {
-            schedules = await Schedule.findAll({ where: { userId: req.user.id } });
+            schedules = await Schedule.findAll({
+                where: { userId: req.user.id },
+                include: [{
+                    model: Category,
+                    attributes: ['id', 'name', 'color'],
+                    through: { attributes: [] }
+                }],
+                order: [['startDate', 'ASC']], // [변경] 시작 시간 순으로 오름차순 정렬
+            });
             categories = await Category.findAll({ where: { userId: req.user.id } });
         } catch (error) {
             console.error(error);
@@ -80,7 +89,6 @@ router.get('/', async (req, res, next) => {
         nextMonth: nextDate.getMonth() + 1,
         schedules,
         categories,
-        
         realYear,
         realMonth,
         realDate,
@@ -90,18 +98,12 @@ router.get('/', async (req, res, next) => {
 
 // 회원가입 페이지 (GET /join)
 router.get('/join', isNotLoggedIn, (req, res) => {
-    res.render('join', {
-        title: '회원가입',
-        joinError: req.query.error,
-    });
+    res.render('join', { title: '회원가입', joinError: req.query.error });
 });
 
 // 로그인 페이지 (GET /login)
 router.get('/login', isNotLoggedIn, (req, res) => {
-    res.render('login', {
-        title: '로그인',
-        loginError: req.query.error,
-    });
+    res.render('login', { title: '로그인', loginError: req.query.error });
 });
 
 module.exports = router;

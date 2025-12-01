@@ -24,6 +24,10 @@ module.exports = (sequelize) => {
       type: DataTypes.DATE,
       allowNull: false,
     },
+    isAllDay: { // 종일 여부
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     isComplete: { // 일정 완료 여부
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -42,6 +46,9 @@ module.exports = (sequelize) => {
 
     // 1:N 관계: Schedule(1)가 Task(N)를 가짐
     db.Schedule.hasMany(db.Task, { foreignKey: 'scheduleId', sourceKey: 'id' });
+    
+    // 다대다 관계
+    db.Schedule.belongsToMany(db.Category, { through: 'ScheduleCategory' });
   };
 
   return Schedule;
