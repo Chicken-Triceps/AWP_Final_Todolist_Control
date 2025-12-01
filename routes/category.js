@@ -1,21 +1,21 @@
 // routes/category.js
+
 const express = require('express');
 const router = express.Router();
 const { Category } = require('../models');
 const { isLoggedIn } = require('./middlewares');
 
-// 카테고리 추가
+// 카테고리 추가 (POST)
 router.post('/', isLoggedIn, async (req, res, next) => {
     try {
         const { name, color } = req.body;
 
-        // [추가] 중복된 이름 검사
+        // 중복된 이름 검사
         const exCategory = await Category.findOne({
             where: { name, userId: req.user.id },
         });
 
         if (exCategory) {
-            // 중복되면 경고창을 띄우고 뒤로가기
             return res.send('<script>alert("이미 존재하는 카테고리 이름입니다."); location.href="/";</script>');
         }
 
@@ -31,11 +31,14 @@ router.post('/', isLoggedIn, async (req, res, next) => {
     }
 });
 
-// [추가] 카테고리 이름 수정
+// [수정] 카테고리 이름 및 색상 수정 (PATCH)
 router.patch('/:id', isLoggedIn, async (req, res, next) => {
     try {
+        const { name, color } = req.body; // 색상 변수 추가
+        
         await Category.update({
-            name: req.body.name,
+            name: name,
+            color: color, // 색상도 업데이트
         }, {
             where: { id: req.params.id, userId: req.user.id },
         });
@@ -46,7 +49,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
     }
 });
 
-// 카테고리 삭제
+// 카테고리 삭제 (DELETE)
 router.delete('/:id', isLoggedIn, async (req, res, next) => {
     try {
         await Category.destroy({

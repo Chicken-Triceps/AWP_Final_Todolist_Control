@@ -21,8 +21,9 @@ module.exports = (sequelize) => {
   Category.associate = (db) => {
     // 사용자가 카테고리를 가짐 (1:N)
     db.Category.belongsTo(db.User, { foreignKey: 'userId', targetKey: 'id' });
-    // 카테고리는 여러 일정을 가짐 (1:N) -> 나중에 Schedule 모델에도 연결 필요
-    // db.Category.hasMany(db.Schedule, ...); 
+
+    // 카테고리(N) : 일정(M) 다대다 관계
+    db.Category.belongsToMany(db.Schedule, { through: 'ScheduleCategory' });
   };
 
   return Category;

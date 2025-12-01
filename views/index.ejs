@@ -23,18 +23,25 @@
             <div class="category-sidebar">
                 <h3>카테고리</h3>
                 
+                <div style="padding: 10px 0; border-bottom: 2px solid #eee; margin-bottom: 10px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: bold;">
+                        <input type="checkbox" id="check-all" class="category-checkbox" checked onchange="toggleAllCategories(this)">
+                        전체 선택
+                    </label>
+                </div>
+
                 <div id="category-list">
                     <% if (categories && categories.length > 0) { %>
                         <% categories.forEach((cat) => { %>
                             <div class="category-item">
-                                <input type="checkbox" class="category-checkbox" value="<%= cat.id %>">
+                                <input type="checkbox" class="category-checkbox filter-checkbox" 
+                                       value="<%= cat.id %>" checked onchange="applyCategoryFilter()">
                                 
                                 <span class="category-label" 
                                       style="background-color: <%= cat.color %>;"
-                                      onclick="editCategory('<%= cat.id %>', '<%= cat.name %>')">
+                                      onclick="openEditCategoryModal('<%= cat.id %>', '<%= cat.name %>', '<%= cat.color %>')">
                                     <%= cat.name %>
                                 </span>
-
                                 <span class="delete-btn" onclick="deleteCategory('<%= cat.id %>')">×</span>
                             </div>
                         <% }); %>
@@ -42,9 +49,7 @@
                         <p style="color:#aaa; font-size:12px;">카테고리를 추가해보세요.</p>
                     <% } %>
                 </div>
-
                 <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-
                 <form action="/category" method="post" style="display: flex; gap: 5px;">
                     <input type="color" name="color" value="#2196F3" style="width: 30px; border: none; background: none; cursor: pointer;">
                     <input type="text" name="name" placeholder="새 카테고리" required style="width: 100px; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
@@ -80,17 +85,42 @@
                             let isHoliday = holidayName ? true : false;
                             let currentDayOfWeek = (startDayOfWeek + day - 1) % 7;
                             let isSunday = (currentDayOfWeek === 0);
+
+                            let todayStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                            
+                            let todaySchedules = schedules.filter(s => {
+                                let sStart = new Date(s.startDate);
+                                let sEnd = new Date(s.endDate);
+                                let startStr = sStart.toISOString().split('T')[0];
+                                let endStr = sEnd.toISOString().split('T')[0];
+                                return todayStr >= startStr && todayStr <= endStr;
+                            });
                         %>
                         <div class="day <%= isToday ? 'today' : '' %> <%= (isHoliday || isSunday) ? 'holiday' : '' %>"
                              data-year="<%= year %>" 
                              data-month="<%= month %>" 
                              data-day="<%= day %>"
+                             data-holiday="<%= holidayName || '' %>" 
+                             data-schedules='<%= JSON.stringify(todaySchedules) %>' 
                              onclick="selectDate(this)">
                             
-                            <span class="date-num"><%= day %></span>
-                            <% if (isHoliday) { %>
-                                <span class="holiday-name"><%= holidayName %></span>
-                            <% } %>
+                            <div class="date-header">
+                                <span class="date-num"><%= day %></span>
+                                <% if (isHoliday) { %>
+                                    <span class="holiday-name"><%= holidayName %></span>
+                                <% } %>
+                            </div>
+
+                            <div class="schedule-dots-container">
+                                <% todaySchedules.forEach(s => { %>
+                                    <% let dotColor = (s.Categories && s.Categories.length > 0) ? s.Categories[0].color : '#999'; 
+                                       let catId = (s.Categories && s.Categories.length > 0) ? s.Categories[0].id : 'none';
+                                    %>
+                                    <span class="schedule-dot" style="background-color: <%= dotColor %>;" 
+                                          title="<%= s.title %>" data-category-id="<%= catId %>"></span>
+                                <% }) %>
+                            </div>
+
                         </div>
                     <% } %>
                 </div>
@@ -100,8 +130,7 @@
                 <div class="selected-date-title" id="panel-date">
                     날짜를 선택하세요
                 </div>
-                <div class="lunar-date" id="panel-lunar">
-                    </div>
+                <div class="lunar-date" id="panel-holiday-info"></div>
                 
                 <h3>일정 목록</h3>
                 <div class="schedule-list" id="panel-list">
@@ -110,13 +139,69 @@
 
                 <button type="button" class="add-btn" onclick="openAddModal()">일정 추가 +</button>
             </div>
-
         </div>
     <% } else { %>
         <div style="text-align: center; margin-top: 50px;">
             <h3>로그인하시면 캘린더를 볼 수 있습니다. 📅</h3>
         </div>
     <% } %>
+
+    <div id="add-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modal-form-title">새 일정 추가</h2>
+            <form> 
+                <input type="hidden" id="schedule-id-field" name="id"> 
+                <div class="form-group"><label>제목</label><input type="text" id="title" name="title" class="form-control" required placeholder="일정 제목을 입력하세요"></div>
+                <div class="form-group"><label><input type="checkbox" name="isAllDay" id="isAllDay" onchange="toggleTimeInputs()"> 하루 종일</label></div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;"><label>시작</label><input type="datetime-local" name="startDate" id="startDate" class="form-control" required></div>
+                    <div style="flex: 1;"><label>종료</label><input type="datetime-local" name="endDate" id="endDate" class="form-control" required></div>
+                </div>
+                <div class="form-group">
+                    <label>카테고리 선택</label>
+                    <div class="checkbox-group">
+                        <% if (categories && categories.length > 0) { %>
+                            <% categories.forEach(cat => { %>
+                                <div class="checkbox-item"><input type="radio" name="categoryIds" value="<%= cat.id %>" id="cat-<%= cat.id %>"><label for="cat-<%= cat.id %>" style="font-weight: normal;"><span style="color:<%= cat.color %>">●</span> <%= cat.name %></label></div>
+                            <% }) %>
+                        <% } else { %>
+                            <span style="color: #999; font-size: 12px;">카테고리가 없습니다.</span>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="form-group"><label>내용</label><textarea name="description" id="description" class="form-control" rows="3"></textarea></div>
+                <div class="modal-footer"><button type="submit" class="btn-save">저장</button></div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="view-schedule-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeViewModal()">&times;</span>
+            <h2 id="view-title"></h2>
+            <div style="font-size: 14px; color: #888; margin-bottom: 10px;"><span id="view-time"></span></div>
+            <h4 style="margin-top: 20px;">카테고리</h4><div id="view-categories" style="margin-bottom: 20px;"></div>
+            <h4>상세 내용</h4><p id="view-description" style="white-space: pre-wrap; border: 1px solid #eee; padding: 10px; border-radius: 5px;"></p>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn-save" style="background-color: #f44336;" id="view-delete-btn">삭제</button>
+                <button type="button" class="btn-save" style="background-color: #2196F3;" id="view-edit-btn">수정</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-category-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEditCategoryModal()">&times;</span>
+            <h2>카테고리 수정</h2>
+            <form onsubmit="event.preventDefault(); submitEditCategoryForm()">
+                <input type="hidden" id="edit-cat-id" required>
+                <div class="form-group"><label>이름</label><input type="text" id="edit-cat-name" class="form-control" required placeholder="새 카테고리 이름을 입력하세요"></div>
+                <div class="form-group"><label>색상</label><input type="color" id="edit-cat-color" class="form-control" style="width: 100px; height: 40px; padding: 0;" required></div>
+                <div class="modal-footer"><button type="submit" class="btn-save">수정 완료</button></div>
+            </form>
+        </div>
+    </div>
 
     <script src="/main.js"></script>
 </body>
