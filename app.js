@@ -12,6 +12,10 @@ const passport = require('passport'); // Passport 모듈
 const passportConfig = require('./passport'); 
 passportConfig(passport); // Passport 설정 함수 실행
 
+// 라우터 불러오기
+const pageRouter = require('./routes/page'); // 페이지 라우터 (메인/로그인/회원가입 화면)
+const userRouter = require('./routes/user'); // 사용자 처리 라우터 (JOIN/LOGIN/LOGOUT)
+
 // 2. 환경 변수(.env) 로드
 // 이 코드가 가장 먼저 실행되어 .env 파일의 변수들을 process.env 객체에 저장
 dotenv.config();
@@ -65,12 +69,9 @@ sequelize.sync({ force: false }) // force: false는 테이블이 이미 있어�
     console.error('데이터베이스 연결 또는 동기화 오류:', err);
   });
 
-// 라우터 설정 (추후 추가) ============================================================================
-
-// 임시 메인 페이지 라우터
-app.get('/', (req, res) => {
-    res.render('index', { title: '일정 관리 서버' });
-});
+// 라우터 연결 ================================================================================
+app.use('/', pageRouter);       // GET /login, GET /join, GET / 요청 처리
+app.use('/user', userRouter);   // POST /user/join, POST /user/login, GET /user/logout 요청 처리
 
 
 // 9. 에러 핸들러 (404 처리)

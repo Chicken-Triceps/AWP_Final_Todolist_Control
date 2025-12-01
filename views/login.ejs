@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 - 일정 관리 서버</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>로그인</h1>
+    <form id="login-form" action="/user/login" method="post">
+        <div>
+            <label for="email">이메일:</label>
+            <input id="email" name="email" type="email" required>
+        </div>
+        <div>
+            <label for="password">비밀번호:</label>
+            <input id="password" name="password" type="password" required>
+        </div>
+        <button type="submit">로그인</button>
+        
+        </form>
+    
+    <% if (loginError) { %>
+        <p class="error-message">로그인 실패: <%= loginError %></p>
+    <% } %>
+    
+    <p><a href="/join">계정이 없으신가요? 회원가입</a></p>
+    <p><a href="/">메인으로 돌아가기</a></p>
+</body>
+</html>
