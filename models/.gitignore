@@ -1,0 +1,9 @@
+# .gitignore 파일 내용
+
+# Node modules
+/node_modules
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
