@@ -71,7 +71,7 @@ sequelize.sync({ force: false }) // force: false는 테이블이 이미 있어�
 
 // 라우터 연결 ================================================================================
 app.use('/', pageRouter);       // GET /login, GET /join, GET / 요청 처리
-app.use('/user', userRouter);   // POST /user/join, POST /user/login, GET /user/logout 요청 처리
+app.use('/auth', userRouter);   // POST /user/join, POST /user/login, GET /user/logout 요청 처리
 
 
 // 9. 에러 핸들러 (404 처리)
