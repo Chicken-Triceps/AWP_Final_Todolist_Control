@@ -10,16 +10,20 @@ module.exports = (sequelize) => {
     },
     email: { // 로그인에 사용될 이메일
       type: DataTypes.STRING(30),
-      allowNull: false,
+      allowNull: true,
       unique: true,
     },
     password: { // 암호화된 비밀번호
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
     },
     nickname: { // 사용자 표시 이름
       type: DataTypes.STRING(15),
       allowNull: false,
+    },
+    snsId: { // 소셜 로그인을 위한 ID 저장 컬럼 추가
+      type: DataTypes.STRING(30),
+      allowNull: true,
     },
     provider: { // local, kakao 등 로그인 방식 구분
       type: DataTypes.STRING(10),

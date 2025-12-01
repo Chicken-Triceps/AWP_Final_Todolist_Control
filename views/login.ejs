@@ -17,8 +17,12 @@
             <input id="password" name="password" type="password" required>
         </div>
         <button type="submit">로그인</button>
-        
-        </form>
+    </form>
+    <div style="margin-top: 20px;">
+        <a href="/auth/kakao" style="background-color: #FEE500; color: #000; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            카카오톡으로 로그인
+        </a>
+    </div>
     
     <% if (loginError) { %>
         <p class="error-message">로그인 실패: <%= loginError %></p>
