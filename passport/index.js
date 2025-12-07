@@ -2,7 +2,7 @@
 
 const passport = require('passport');
 const local = require('./localStrategy');
-const kakao = require('./kakaoStrategy'); // 1. 카카오 전략 불러오기
+const kakao = require('./kakaoStrategy'); // 카카오 전략 불러오기
 const { User } = require('../models');
 
 module.exports = () => {
@@ -17,5 +17,5 @@ module.exports = () => {
   });
 
   local();
-  kakao(); // 2. 카카오 전략 등록 실행
+  kakao(); // 카카오 전략 등록 실행
 };

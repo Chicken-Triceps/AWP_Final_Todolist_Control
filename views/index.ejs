@@ -8,7 +8,7 @@
 <body>
     <div id="user-status" style="margin-bottom: 20px; padding: 0 20px;">
         <% if (user) { %>
-            <h2>🎉 환영합니다, <%= user.nickname %>님!</h2>
+            <h2>환영합니다, <%= user.nickname %>님!</h2>
             <a href="/auth/logout">로그아웃</a>
         <% } else { %>
             <h2>로그인/회원가입이 필요합니다.</h2>
@@ -142,7 +142,7 @@
         </div>
     <% } else { %>
         <div style="text-align: center; margin-top: 50px;">
-            <h3>로그인하시면 캘린더를 볼 수 있습니다. 📅</h3>
+            <h3>로그인하시면 캘린더를 볼 수 있습니다.</h3>
         </div>
     <% } %>
 

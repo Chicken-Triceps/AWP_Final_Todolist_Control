@@ -1,11 +1,9 @@
-// routes/category.js
-
 const express = require('express');
 const router = express.Router();
 const { Category } = require('../models');
 const { isLoggedIn } = require('./middlewares');
 
-// 카테고리 추가 (POST)
+// 카테고리 추가
 router.post('/', isLoggedIn, async (req, res, next) => {
     try {
         const { name, color } = req.body;
@@ -31,7 +29,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
     }
 });
 
-// [수정] 카테고리 이름 및 색상 수정 (PATCH)
+// 카테고리 이름 및 색상 수정
 router.patch('/:id', isLoggedIn, async (req, res, next) => {
     try {
         const { name, color } = req.body; // 색상 변수 추가
@@ -49,7 +47,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
     }
 });
 
-// 카테고리 삭제 (DELETE)
+// 카테고리 삭제
 router.delete('/:id', isLoggedIn, async (req, res, next) => {
     try {
         await Category.destroy({

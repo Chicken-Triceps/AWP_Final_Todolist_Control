@@ -7,22 +7,22 @@ const passport = require('passport'); // Passport 모듈
 
 const { User } = require('../models');
 
-// 회원가입 처리 (POST /user/join) =======================================================================
+// 회원가입 처리 =======================================================================
 router.post('/join', async (req, res, next) => {
     const { email, nickname, password } = req.body;
     try {
-        // 1. 기존 사용자 확인
+        // 기존 사용자 확인
         const exUser = await User.findOne({ where: { email } });
         if (exUser) {
             // 이미 가입된 이메일인 경우
             return res.redirect('/join?error=exist'); // 에러 메시지와 함께 리다이렉트
         }
 
-        // 2. 비밀번호 암호화 (해싱)
+        // 비밀번호 암호화 (해싱)
         // 보안을 위해 비밀번호를 평문으로 저장하지 않고 bcrypt로 해시
         const hash = await bcrypt.hash(password, 12); // 솔트 라운드 12
 
-        // 3. 사용자 정보 DB에 생성
+        // 사용자 정보 DB에 생성
         await User.create({
             email,
             nickname,
@@ -38,21 +38,21 @@ router.post('/join', async (req, res, next) => {
 });
 
 
-// 로그인 처리 (POST /user/login) =========================================================================
-// Passport의 로컬 전략을 사용하여 인증을 시도합니다.
+// 로그인 처리 =========================================================================
+// Passport의 로컬 전략 사용
 router.post('/login', (req, res, next) => {
-    // passport.authenticate('local', ...) 미들웨어를 실행합니다.
+    // passport.authenticate 미들웨어 실행
     passport.authenticate('local', (authError, user, info) => {
         if (authError) {
             console.error(authError);
             return next(authError); // 서버 에러 발생 시
         }
         if (!user) {
-            // 인증 실패 시 (비밀번호 불일치, 사용자 없음 등)
+            // 인증 실패 시
             return res.redirect(`/login?error=${info.message}`); // 실패 메시지와 함께 리다이렉트
         }
         
-        // 로그인 성공 시 (세션에 사용자 정보 저장)
+        // 로그인 성공 시
         return req.login(user, (loginError) => {
             if (loginError) {
                 console.error(loginError);
@@ -64,7 +64,7 @@ router.post('/login', (req, res, next) => {
 });
 
 
-// ** 로그아웃 처리 (GET /user/logout) **
+// 로그아웃 처리
 router.get('/logout', (req, res) => {
     req.logout(() => { // req.session.destroy()를 실행, 세션 삭제
         res.redirect('/'); // 메인 페이지로 이동
