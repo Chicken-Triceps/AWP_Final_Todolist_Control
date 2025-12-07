@@ -67,7 +67,7 @@ router.get('/', async (req, res, next) => {
                     attributes: ['id', 'name', 'color'],
                     through: { attributes: [] }
                 }],
-                order: [['startDate', 'ASC']], // [변경] 시작 시간 순으로 오름차순 정렬
+                order: [['startDate', 'ASC']], // [시작 시간 순으로 오름차순 정렬
             });
             categories = await Category.findAll({ where: { userId: req.user.id } });
         } catch (error) {

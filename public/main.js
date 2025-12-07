@@ -3,7 +3,7 @@
 let selectedDateInfo = null;
 
 // ---------------------------------------------------------
-// 1. 캘린더 날짜 클릭 처리
+// 캘린더 날짜 클릭 처리
 // ---------------------------------------------------------
 function selectDate(element, isClick = true) {
     const year = element.getAttribute('data-year');
@@ -122,7 +122,7 @@ function applyCategoryFilter() {
 
 
 // ---------------------------------------------------------
-// 2. 일정 상세 보기
+// 일정 상세 보기
 // ---------------------------------------------------------
 function openViewModal(schedule) {
     const modal = document.getElementById('view-schedule-modal');
@@ -179,10 +179,10 @@ function reloadWithSelection() {
 
 
 // ---------------------------------------------------------
-// 3. 일정 추가/수정 (버그 수정 완료)
+// 일정 추가/수정
 // ---------------------------------------------------------
 
-// [NEW] 날짜 포맷팅 헬퍼 함수 (타임존 문제 해결 및 YYYY-MM-DDTHH:mm 변환)
+// 날짜 포맷팅 헬퍼 함수 (YYYY-MM-DDTHH:mm 변환)
 function formatDateForInput(dateStr) {
     const date = new Date(dateStr);
     const YYYY = date.getFullYear();
@@ -217,7 +217,7 @@ function openAddModal(schedule = null) {
     const endInput = document.getElementById('endDate');
     const isAllDayCheckbox = document.getElementById('isAllDay');
 
-    // === [수정 모드] ===
+    // 수정 모드
     if (schedule) {
         title.textContent = '일정 수정';
         saveBtn.textContent = '수정 완료';
@@ -227,11 +227,11 @@ function openAddModal(schedule = null) {
         document.getElementById('title').value = schedule.title;
         document.getElementById('description').value = schedule.description;
         
-        // [중요] 값을 넣기 전에 타입을 'datetime-local'로 강제 초기화 (값 누락 방지)
+        // 값을 넣기 전에 타입을 'datetime-local'로 강제 초기화
         startInput.type = 'datetime-local';
         endInput.type = 'datetime-local';
 
-        // [중요] 안전한 포맷팅 함수 사용
+        // 포맷팅 함수 사용
         startInput.value = formatDateForInput(schedule.startDate);
         endInput.value = formatDateForInput(schedule.endDate);
         
@@ -248,10 +248,10 @@ function openAddModal(schedule = null) {
             }
         }
 
-        // 체크 여부에 따라 UI 조정 (값은 이미 들어있음)
+        // 체크 여부에 따라 UI 조정
         toggleTimeInputs();
 
-    // === [추가 모드] ===
+    // 추가 모드
     } else {
         title.textContent = '새 일정 추가';
         saveBtn.textContent = '저장';
@@ -329,7 +329,7 @@ function deleteSchedule(id) {
 
 function closeModal() { document.getElementById('add-modal').style.display = 'none'; }
 
-// [수정] 하루 종일 체크 시 값 유지하며 타입 변경 (안전하게)
+// 하루 종일 체크 시 값 유지하며 타입 변경
 function toggleTimeInputs() {
     const isChecked = document.getElementById('isAllDay').checked;
     const startInput = document.getElementById('startDate');
@@ -369,7 +369,7 @@ function toggleTimeInputs() {
     }
 }
 
-// --- 카테고리 관리 (기존 유지) ---
+// 카테고리 관리
 function deleteCategory(id) {
     if (!confirm('정말 이 카테고리를 삭제하시겠습니까?')) return;
     fetch(`/category/${id}`, { method: 'DELETE' })
